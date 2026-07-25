@@ -1,0 +1,12 @@
+the VM heap is contiguos span of memory. each allocation is 16b aligned.
+user application is responsible for providing appropriately sized and aligned
+buffer.
+
+The heap consits of allocated object of size determined by their class and
+free space identified by having all zero header class word, next word is size
+of the hole in 16B allocation units (two additional words are reserved for 
+allocator).
+
+Sweep phase iterates through the entire heap and deallocates non-marked 
+objects, by marking them as free space. In the same scan it also coallesces
+adjacent free space records and updates the freelist links accordingly.
