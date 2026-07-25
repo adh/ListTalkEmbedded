@@ -1,0 +1,20 @@
+32b words
+
+tag in low 2 bits:
+00 - object
+10 - symbol
+x1 - fixnum
+
+special values:
+0x00000000 - LTE_INVALID
+0xfffffffc - LTE_NIL
+
+object layout:
+next pointer (LSB is mark bit)
+class pointer
+... slots
+
+symbol layout:
+package pointer
+symbol name
+
