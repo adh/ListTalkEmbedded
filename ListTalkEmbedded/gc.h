@@ -18,6 +18,9 @@ void LTE_gc_register_root(void* root);
 void LTE_gc_unregister_root(void* root);
 LTE_Value LTE_gc_alloc(LTE_Class* cls);
 
+void LTE_gc_mark_object(LTE_Value object);
+void LTE_gc_mark_objects(LTE_Value* objects, size_t count);
+
 LTE__END_DECLS
 
 #endif

@@ -27,11 +27,15 @@ void LTE_gc_init(uintptr_t* start, size_t size){
     initial_node->header = 0; /* mark bit is 0 */
     initial_node->size = heap_size;
     initial_node->next = NULL;
+    free_list_head = initial_node;
 }
 
 static void mark_object(LTE_Value object){
     if(object == LTE_NIL || object == LTE_INVALID){
         return;
+    }
+    if (object & 3) {
+        return; /* Not a pointer to an object */
     }
     LTE_Object* obj = (LTE_Object*)object;
     if(obj->cls & 1){
@@ -39,6 +43,7 @@ static void mark_object(LTE_Value object){
     }
     obj->cls |= 1; /* Set mark bit */
     LTE_Class* cls = (LTE_Class*)(obj->cls & ~((uintptr_t)1));
+    // TODO: do not mark primitives and special forms
     if(cls->mark){
         cls->mark(object);
     }
@@ -165,4 +170,13 @@ LTE_Value LTE_gc_alloc(LTE_Class* cls){
     object->cls = (uintptr_t)cls;
     allocated_since_last_gc += object_size;
     return (LTE_Value)object;
+}
+
+void LTE_gc_mark_object(LTE_Value object){
+    mark_object(object);
+}
+void LTE_gc_mark_objects(LTE_Value* objects, size_t count){
+    for(size_t i = 0; i < count; ++i){
+        mark_object(objects[i]);
+    }
 }
