@@ -1,9 +1,9 @@
-32b words
+Object consist of unitptr_t sized words.
 
 tag in low 2 bits:
 00 - object
 10 - symbol
-x1 - fixnum
+x1 - fixnum (masked to 31bits even on 64b platforms)
 
 special values:
 0x00000000 - LTE_INVALID
@@ -18,3 +18,9 @@ symbol layout:
 package pointer
 symbol name
 
+Symbols and packages are allocated outside of garbage collected heap and 
+uncollectable.
+
+Primitives and special forms follow the GC'd object layout, but live outside
+of GC'd heap. These are not marked by collector and cannot contain references
+to GC'd heap.

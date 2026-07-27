@@ -1,4 +1,4 @@
-the VM heap is contiguos span of memory. each allocation is 16b aligned.
+the VM heap is contiguos span of memory. each allocation is 4 word aligned.
 user application is responsible for providing appropriately sized and aligned
 buffer.
 
@@ -10,3 +10,12 @@ allocator).
 Sweep phase iterates through the entire heap and deallocates non-marked 
 objects, by marking them as free space. In the same scan it also coallesces
 adjacent free space records and updates the freelist links accordingly.
+
+Object:
+class pointer
+fields
+
+Free space:
+zero
+size
+next pointer
