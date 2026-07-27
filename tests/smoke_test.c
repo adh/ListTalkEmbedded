@@ -14,6 +14,8 @@ typedef struct TestObject_s {
     LTE_Value child;
 } TestObject;
 
+LTE_DECLARE_CLASS(TestObject)
+
 static void mark_test_object(LTE_Value value){
     TestObject* object = (TestObject*)value;
 
@@ -23,6 +25,22 @@ static void mark_test_object(LTE_Value value){
 static LTE_Class TestClass = {
     .instance_size = sizeof(TestObject),
     .mark = mark_test_object,
+};
+
+static LTE_Slot_Descriptor NativeTest_slots[] = {
+    {"child", offsetof(TestObject, child), &LTE_SlotType_Object},
+    LTE_NULL_NATIVE_CLASS_SLOT_DESCRIPTOR
+};
+
+LTE_DEFINE_CLASS(TestObject) {
+    .superclass = &LTE_Object_class,
+    .metaclass_superclass = &LTE_Class_class,
+    .name = "TestObject",
+    .documentation = "Smoke test object class.",
+    .instance_size = sizeof(TestObject),
+    .class_flags = LTE_CLASS_FLAG_ALLOCATABLE,
+    .mark = mark_test_object,
+    .slots = NativeTest_slots,
 };
 
 static size_t finalized_class_count = 0;
@@ -70,6 +88,7 @@ int main(void){
     LTE_Value child;
     LTE_Class* heap_class;
     LTE_Value heap_class_instance;
+    TestObject* native_object;
 
     LTE_INIT();
 
@@ -103,6 +122,14 @@ int main(void){
         return 1;
     }
 
+    LTE_init_native_class(&TestObject_class);
+    if (expect(TestObject_class.native_descriptor == NULL) ||
+        expect(TestObject_class.superclasses[0] == &LTE_Object_class) ||
+        expect(TestObject_class.slot_count == 1) ||
+        expect(TestObject_class.slots[0].offset == offsetof(TestObject, child))){
+        return 1;
+    }
+
     LTE_InlineHash_init(&hash);
     LTE_StringHash_at_put(&hash, "answer", &value);
     if (expect(LTE_StringHash_at(&hash, "answer") == &value)){
@@ -112,6 +139,11 @@ int main(void){
 
     heap = LTE_calloc(256, sizeof(uintptr_t));
     LTE_gc_init(heap, 256 * sizeof(uintptr_t));
+    native_object = LTE_Class_ALLOC(TestObject);
+    native_object->child = LTE_NIL;
+    if (expect(TestObject_p((LTE_Value)native_object))){
+        return 1;
+    }
     parent = LTE_gc_alloc(&TestClass);
     child = LTE_gc_alloc(&TestClass);
     ((TestObject*)parent)->child = child;

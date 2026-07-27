@@ -7,6 +7,8 @@
 #define H__ListTalkEmbedded__Class__
 
 #include <ListTalkEmbedded/macros/env_macros.h>
+#include <ListTalkEmbedded/error.h>
+#include <ListTalkEmbedded/utils.h>
 #include <ListTalkEmbedded/value.h>
 
 LTE__BEGIN_DECLS
@@ -35,6 +37,14 @@ struct LTE_SlotType_s {
 
 extern LTE_SlotType LTE_SlotType_Object;
 extern LTE_SlotType LTE_SlotType_ReadonlyObject;
+
+#define LTE_CLASS_FLAG_FLEXIBLE    1
+#define LTE_CLASS_FLAG_SPECIAL     2
+#define LTE_CLASS_FLAG_ABSTRACT    4
+#define LTE_CLASS_FLAG_FINAL       8
+#define LTE_CLASS_FLAG_IMMUTABLE  16
+#define LTE_CLASS_FLAG_SCALAR     32
+#define LTE_CLASS_FLAG_ALLOCATABLE 64
 
 typedef struct LTE_Slot_Descriptor {
     char* name;
@@ -88,6 +98,50 @@ struct LTE_Class_s {
     LTE_Class_Descriptor* native_descriptor; /* Native class descriptor */
 };
 
+#define LTE_STATIC_CLASS(name) ((LTE_Value)(uintptr_t)&name##_class)
+
+#define LTE_DECLARE_CLASS(name) \
+    typedef struct name##_s name; \
+    extern LTE_Class name##_class; \
+    extern LTE_Class name##_class_class; \
+    static inline int name##_p(LTE_Value value){ \
+        return LTE_Value_class(value) == &name##_class; \
+    } \
+    static inline name* name##_from_value(LTE_Value value){ \
+        if (!name##_p(value)){ \
+            LTE_error("Unexpected object class"); \
+        } \
+        return (name*)(uintptr_t)value; \
+    }
+
+#define LTE_DEFINE_CLASS(c_name) \
+    static LTE_Class_Descriptor c_name##_class_descriptor; \
+    LTE_Class c_name##_class_class = { \
+        .base = {.cls = (uintptr_t)&LTE_Class_class_class}, \
+        .instance_size = sizeof(LTE_Class), \
+    }; \
+    LTE_Class c_name##_class = { \
+        .base = {.cls = (uintptr_t)&c_name##_class_class}, \
+        .native_descriptor = &c_name##_class_descriptor, \
+    }; \
+    static void LTE___init_##c_name(void){ \
+        LTE_init_native_class(&c_name##_class); \
+    }; \
+    LTE_REGISTER_CONSTRUCTOR(LTE___init_##c_name) \
+    static LTE_Class_Descriptor c_name##_class_descriptor =
+
+extern LTE_Class LTE_Object_class;
+extern LTE_Class LTE_Object_class_class;
+extern LTE_Class LTE_Class_class;
+extern LTE_Class LTE_Class_class_class;
+
+void LTE_init_native_class(LTE_Class* klass);
+void* LTE_Class_alloc(LTE_Class* klass);
+void* LTE_Class_alloc_flexible(LTE_Class* klass, size_t flex);
+
+#define LTE_Class_ALLOC(type) (type*)(LTE_Class_alloc(&type##_class))
+#define LTE_Class_ALLOC_FLEXIBLE(type, flex) \
+    (type*)(LTE_Class_alloc_flexible(&type##_class, flex))
 
 LTE__END_DECLS
 

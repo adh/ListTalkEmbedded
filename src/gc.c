@@ -85,7 +85,7 @@ static void mark_object(LTE_Value object){
     }
     obj->cls |= LTE_VALUE_MARK_BIT;
 
-    LTE_Class* cls = LTE_Object_class(object);
+    LTE_Class* cls = LTE_Object_class_pointer(object);
     mark_object((LTE_Value)cls);
     /* TODO: do not mark primitives and special forms. */
     if(cls->mark){
@@ -123,7 +123,7 @@ static void sweep(void){
         } else {
             LTE_Object* object = (LTE_Object*)current;
 
-            LTE_Class* cls = LTE_Object_class((LTE_Value)object);
+            LTE_Class* cls = LTE_Object_class_pointer((LTE_Value)object);
 
             size = class_instance_size(cls);
             if (current + size > heap_end){

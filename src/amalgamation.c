@@ -4,6 +4,7 @@
  */
 
 #include "alloc.c"
+#include "Class.c"
 #include "error.c"
 #include "gc.c"
 #include "init.c"

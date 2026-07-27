@@ -23,8 +23,15 @@ typedef struct LTE_Object_s {
 #define LTE_VALUE_TAG_MASK ((uintptr_t)0x3)
 #define LTE_VALUE_MARK_BIT ((uintptr_t)0x1)
 
-static inline LTE_Class* LTE_Object_class(LTE_Value object){
+static inline LTE_Class* LTE_Object_class_pointer(LTE_Value object){
     return (LTE_Class*)(((LTE_Object*)object)->cls & ~LTE_VALUE_MARK_BIT);
+}
+
+static inline LTE_Class* LTE_Value_class(LTE_Value value){
+    if (value == LTE_INVALID || value == LTE_NIL || (value & LTE_VALUE_TAG_MASK) != 0){
+        return NULL;
+    }
+    return LTE_Object_class_pointer(value);
 }
 
 LTE__END_DECLS
