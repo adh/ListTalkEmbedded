@@ -7,8 +7,11 @@
 #define H__ListTalkEmbedded__ListTalkEmbedded__
 
 #include <ListTalkEmbedded/alloc.h>
+#include <ListTalkEmbedded/Class.h>
 #include <ListTalkEmbedded/error.h>
+#include <ListTalkEmbedded/gc.h>
 #include <ListTalkEmbedded/utils.h>
+#include <ListTalkEmbedded/value.h>
 
 LTE__BEGIN_DECLS
 

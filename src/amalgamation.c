@@ -5,6 +5,7 @@
 
 #include "alloc.c"
 #include "error.c"
+#include "gc.c"
 #include "init.c"
 #include "utils.c"
 #include "utils/base64.c"
