@@ -54,10 +54,10 @@ static int heap_contains_pointer(uintptr_t value){
         && (value & LTE_VALUE_TAG_MASK) == 0;
 }
 
-void LTE_gc_init(uintptr_t* start, size_t size){
+void LTE__gc_init(uintptr_t* start, size_t size, uintptr_t* stack_begin){
     heap_start = (unsigned char*)start;
     heap_size = size & ~(LTE_GC_ALIGNMENT - 1);
-    stack_start = (uintptr_t*)__builtin_frame_address(1);
+    stack_start = stack_begin;
 
     if (heap_size < align_size(sizeof(FreeListNode))){
         LTE_error("GC heap is too small");

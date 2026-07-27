@@ -12,7 +12,9 @@
 
 LTE__BEGIN_DECLS
 
-void LTE_gc_init(uintptr_t* heap_start, size_t heap_size);
+void LTE__gc_init(uintptr_t* heap_start,
+                  size_t heap_size,
+                  uintptr_t* stack_begin);
 void LTE_gc_collect(void);
 void LTE_gc_register_root(void* root);
 void LTE_gc_unregister_root(void* root);
@@ -22,5 +24,10 @@ void LTE_gc_mark_object(LTE_Value object);
 void LTE_gc_mark_objects(LTE_Value* objects, size_t count);
 
 LTE__END_DECLS
+
+#define LTE_gc_init(heap_start, heap_size) \
+    LTE__gc_init((heap_start),             \
+                 (heap_size),              \
+                 (uintptr_t*)__builtin_frame_address(0))
 
 #endif
