@@ -13,9 +13,11 @@ LTE__BEGIN_DECLS
 
 typedef struct LTE_Class_s LTE_Class;
 
-typedef char*(*LTE_Class_debugPrint)(LTE_Value self);
+typedef char*(*LTE_Class_debugPrint_Func)(LTE_Value self);
 typedef size_t(*LTE_Class_hash_Func)(LTE_Value self);
 typedef int(*LTE_Class_equal_p_Func)(LTE_Value self, LTE_Value other);
+typedef void (*LTE_Class_finalize_Func)(LTE_Value self);
+typedef void (*LTE_Class_mark_Func)(LTE_Value self);
 
 typedef struct LTE_SlotType_s LTE_SlotType;
 typedef struct LTE_Primitive_s LTE_Primitive;
@@ -55,13 +57,37 @@ typedef struct LTE_Class_Descriptor_s {
     char* documentation;
     size_t instance_size;
     int class_flags;
-    LTE_Class_debugPrint debugPrint;
+    LTE_Class_debugPrint_Func debugPrint;
     LTE_Class_hash_Func hash;
     LTE_Class_equal_p_Func equal_p;
+    LTE_Class_finalize_Func finalize;
+    LTE_Class_mark_Func mark;
     LTE_Slot_Descriptor* slots;
     LTE_Method_Descriptor* methods;
     LTE_Method_Descriptor* class_methods;
 } LTE_Class_Descriptor;
+
+struct LTE_Class_s {
+    LTE_Object base;
+    LTE_Class** superclasses; /* NULL terminated */
+    LTE_Value precedence_list; /* List */
+    size_t instance_size;
+    unsigned int class_flags;
+    size_t slot_count;
+    LTE_Class_Slot* slots;
+    LTE_Value methods;
+    LTE_Value method_cache;
+    uintptr_t cache_version;
+    LTE_Value name;
+    LTE_Class_debugPrint_Func debugPrint;
+    LTE_Class_hash_Func hash;
+    LTE_Class_equal_p_Func equal_p;
+    LTE_Class_finalize_Func finalize;
+    LTE_Class_mark_Func mark;
+    LTE_Value documentation;
+    LTE_Class_Descriptor* native_descriptor; /* Native class descriptor */
+};
+
 
 LTE__END_DECLS
 
