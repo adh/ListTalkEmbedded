@@ -8,8 +8,10 @@
 
 #include <ListTalkEmbedded/alloc.h>
 #include <ListTalkEmbedded/Class.h>
+#include <ListTalkEmbedded/Primitive.h>
 #include <ListTalkEmbedded/error.h>
 #include <ListTalkEmbedded/gc.h>
+#include <ListTalkEmbedded/tail_call.h>
 #include <ListTalkEmbedded/utils.h>
 #include <ListTalkEmbedded/value.h>
 

@@ -37,6 +37,20 @@ static LTE_Class ClassClass = {
     .finalize = finalize_class_object,
 };
 
+LTE_DEFINE_PRIMITIVE_FLAGS(
+    primitive_test_noop,
+    "test-noop",
+    "()",
+    "Test helper primitive.",
+    LTE_PRIMITIVE_FLAG_PURE
+){
+    (void)arguments;
+    (void)invocation_context_kind;
+    (void)invocation_context_data;
+    (void)tail_call_unwind_marker;
+    return LTE_NIL;
+}
+
 static int expect(int condition){
     return condition ? 0 : 1;
 }
@@ -49,6 +63,7 @@ int main(void){
     char* base64;
     LTE_StringBuilder* builder;
     LTE_InlineHash hash;
+    LTE_Primitive* primitive = &primitive_test_noop;
     int value = 42;
     uintptr_t* heap;
     LTE_Value parent;
@@ -81,6 +96,12 @@ int main(void){
         return 1;
     }
     LTE_StringBuilder_free(builder);
+
+    if (expect(primitive->function != NULL) ||
+        expect(primitive->flags == LTE_PRIMITIVE_FLAG_PURE) ||
+        expect(strcmp(primitive->name, "test-noop") == 0)){
+        return 1;
+    }
 
     LTE_InlineHash_init(&hash);
     LTE_StringHash_at_put(&hash, "answer", &value);
